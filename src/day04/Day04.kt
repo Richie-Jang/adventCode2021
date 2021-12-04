@@ -46,7 +46,7 @@ fun checkBingo(grid: Grid): Boolean {
 
     // ver
     for (i in 0 until 5) {
-        val gg = (0 until 5).map { grid[i][it] }
+        val gg = (0 until 5).map { grid[it][i] }
         val r = gg.all { it.selected }
         if (r) return true
     }
@@ -77,9 +77,9 @@ fun printGrid(g: Grid) {
 }
 
 // part1
-fun main() {
+fun main1() {
 
-    val inputs = readInput("day04")
+    val inputs = readTestInput("day04")
     val (l, grids) = setup(inputs)
 
     (0 until 4).forEach { c ->
@@ -109,5 +109,39 @@ fun main() {
         // not found ?? never happened for this
         println("Never Happened")
     }
+
+}
+
+// part2
+fun main() {
+    val input = readInput("day04")
+    val (callInts, grids) = setup(input)
+    // first 0 ~ 4 call number
+    (0 until 4).forEach { c ->
+        grids.forEach { markGrid(it, callInts[c]) }
+    }
+
+    val doneGridSet = mutableMapOf<Grid, Int>()
+    var lastDoneGrid : Grid? = null
+
+    for (i in (4 until callInts.size)) {
+        // check doneGridSet has all
+        if (doneGridSet.size == grids.size) break
+
+        for (gi in grids.indices) {
+            val g = grids[gi]
+            if (g in doneGridSet) continue
+            val callNum = callInts[i]
+            markGrid(g, callNum)
+            if (checkBingo(g)) {
+                doneGridSet[g] = callNum
+                lastDoneGrid = g
+            }
+        }
+    }
+
+    val v1 = collectSumFromGrid(lastDoneGrid!!)
+    val v2 = doneGridSet.getValue(lastDoneGrid!!)
+    println(v1 * v2)
 
 }
